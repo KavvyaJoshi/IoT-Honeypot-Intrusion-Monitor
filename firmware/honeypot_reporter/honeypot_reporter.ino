@@ -30,6 +30,10 @@ static const uint16_t MAX_PATH_LENGTH = 512;
 static const uint8_t QUEUE_SIZE = 16;
 static const uint8_t MAX_DECISIONS = 8;
 static const uint32_t SETTINGS_MAGIC = 0x48504f54;  // "HPOT"
+// Time allowed per join attempt (association + WPA2 handshake + DHCP). The library default of 5 s
+// is too short for iPhone Personal Hotspot, which often needs longer; a timed-out attempt is then
+// aborted by the next run()'s scan/disconnect, so the board never finishes joining.
+static const uint32_t WIFI_JOIN_TIMEOUT_MS = 20000;
 
 ESP8266WebServer server(80);
 ESP8266WiFiMulti wifiMulti;
@@ -527,6 +531,68 @@ void handleNotFound() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Wi-Fi diagnostics (never prints passwords or keys)
+// ---------------------------------------------------------------------------------------------
+const char *wifiStatusText(int status) {
+  switch (status) {
+    case WL_IDLE_STATUS: return "idle: join did not finish in time";
+    case WL_NO_SSID_AVAIL: return "SSID not found";
+    case WL_CONNECT_FAILED: return "connection failed";
+    case WL_CONNECTION_LOST: return "connection lost";
+    case WL_WRONG_PASSWORD: return "wrong password";
+    case WL_DISCONNECTED: return "disconnected: association/handshake/DHCP did not finish";
+    default: return "other";
+  }
+}
+
+const char *encryptionText(uint8_t type) {
+  switch (type) {
+    case ENC_TYPE_NONE: return "open";
+    case ENC_TYPE_WEP: return "WEP";
+    case ENC_TYPE_TKIP: return "WPA (TKIP)";
+    case ENC_TYPE_CCMP: return "WPA2 (CCMP)";
+    case ENC_TYPE_AUTO: return "WPA/WPA2 auto";
+    default: return "unknown (possibly WPA3, unsupported by ESP8266)";
+  }
+}
+
+void printWifiProfiles() {
+  for (const auto &p : PROFILES) {
+    if (!strlen(p.ssid)) continue;
+    size_t len = strlen(p.password);
+    Serial.printf("[wifi] profile \"%s\": password %s\n", p.ssid,
+                  len == 0 ? "EMPTY" : (len < 8 || len > 63) ? "set but INVALID length (WPA2 needs 8-63 chars)" : "set");
+  }
+}
+
+// Called after a failed join: explains why using the status code and the scan wifiMulti just ran.
+void printWifiDiagnostics() {
+  int status = WiFi.status();
+  Serial.printf("[wifi] not connected: status %d = %s\n", status, wifiStatusText(status));
+  int found = WiFi.scanComplete();
+  if (found < 0) {
+    Serial.println("[wifi] no scan results available");
+    return;
+  }
+  bool seen = false;
+  for (int i = 0; i < found; i++) {
+    for (const auto &p : PROFILES) {
+      if (strlen(p.ssid) && WiFi.SSID(i) == p.ssid) {
+        seen = true;
+        Serial.printf("[wifi] \"%s\" is visible: channel %d, RSSI %d dBm, security %s\n", p.ssid, WiFi.channel(i),
+                      WiFi.RSSI(i), encryptionText(WiFi.encryptionType(i)));
+      }
+    }
+  }
+  if (!seen) {
+    Serial.printf("[wifi] configured SSID not among %d visible 2.4 GHz networks. On the iPhone: Settings >\n", found);
+    Serial.println("       Personal Hotspot > turn ON 'Maximize Compatibility' and keep that screen open while joining.");
+  } else if (status == WL_WRONG_PASSWORD) {
+    Serial.println("[wifi] the hotspot rejected the password: re-check WIFI_1_PASSWORD in secrets.h (case-sensitive).");
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
 void setup() {
   Serial.begin(115200);
   delay(100);
@@ -537,6 +603,7 @@ void setup() {
   for (const auto &p : PROFILES) {
     if (strlen(p.ssid)) wifiMulti.addAP(p.ssid, p.password);
   }
+  printWifiProfiles();
 
   // Core 3.1.x takes header names as variadic arguments.
   server.collectHeaders("User-Agent", "Content-Type");
@@ -553,12 +620,8 @@ void loop() {
   pollSerial();
 
   // Joins the strongest configured network and reconnects automatically.
-  if (wifiMulti.run(5000) != WL_CONNECTED) {
-    static uint32_t lastNotice = 0;
-    if (millis() - lastNotice > 10000) {
-      lastNotice = millis();
-      Serial.println("[wifi] not connected; retrying (2.4 GHz networks only)");
-    }
+  if (wifiMulti.run(WIFI_JOIN_TIMEOUT_MS) != WL_CONNECTED) {
+    printWifiDiagnostics();  // each failed run() already took a scan + up to 20 s, so this is not spammy
     return;
   }
 
