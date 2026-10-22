@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+
+/* Design tokens. The dashboard is dark-only by design (SOC style); chart series colours live in
+   src/lib/constants.js and were validated for contrast and colour-vision separation on --color-surface. */
+@theme {
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'JetBrains Mono', Consolas, 'Liberation Mono', monospace;
+
+  --color-canvas: #0a1020;
+  --color-surface: #111a2e;
+  --color-surface-2: #16223b;
+  --color-surface-3: #1c2a47;
+  --color-line: #1f2c47;
+  --color-line-strong: #2c3c5e;
+  --color-ink: #e6ebf5;
+  --color-ink-2: #aab5ca;
+  --color-ink-3: #7d89a3;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Visible keyboard focus everywhere. */
+:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Brief highlight for rows that just arrived over Socket.IO. */
+@keyframes row-arrive {
+  from {
+    background-color: rgb(56 189 248 / 0.16);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+.row-arrive {
+  animation: row-arrive 2.4s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row-arrive {
+    animation: none;
+  }
+}
+
+/* Recharts: keep focus rings off SVG wrappers (keyboard focus is on the table toggle). */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}

@@ -1,0 +1,16 @@
+{
+  "name": "mini-iot-honeypot",
+  "version": "1.0.0",
+  "description": "Mini IoT Honeypot & Intrusion Monitor: ESP8266 reporter, Express detection backend and React SOC dashboard",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "test:backend": "npm --prefix backend test",
+    "test:frontend": "npm --prefix frontend test",
+    "smoke": "npm --prefix backend run smoke",
+    "build": "npm --prefix frontend run build"
+  }
+}
