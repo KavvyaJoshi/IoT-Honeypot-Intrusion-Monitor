@@ -1,4 +1,4 @@
-import { Gauge, Layers, RotateCcw, Save, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, ChevronUp, Gauge, Layers, RotateCcw, Save, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { describeError } from '../api/client.js';
 import { api } from '../api/endpoints.js';
@@ -7,7 +7,7 @@ import { AdminRequiredNotice } from '../components/AdminDialog.jsx';
 import { DataTable } from '../components/charts/ChartCard.jsx';
 import { Badge, categoryLabel, SeverityBadge, SourceBadge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
-import { Card, CardBody, CardHeader, PageHeader } from '../components/ui/Card.jsx';
+import { Card, CardHeader, PageHeader } from '../components/ui/Card.jsx';
 import { SelectField, TextArea, TextField, Toggle } from '../components/ui/Controls.jsx';
 import { AsyncContent, EmptyState } from '../components/ui/States.jsx';
 import { useSystem } from '../context/SystemContext.jsx';
@@ -21,6 +21,39 @@ const ACTION_OPTIONS = [
   { value: 'rate-limit', label: 'Rate-limit source' },
   { value: 'block', label: 'Block source' },
 ];
+
+const ACTION_WORDS = { log: 'Logs it', 'rate-limit': 'Slows the source', block: 'Blocks the source' };
+
+/** Short, plain-language framing for each rule; the technical description is shown under "Tune". */
+const PLAIN_RULES = {
+  'request-rate': { title: 'Too many requests', catches: 'One source sending requests too fast, like a flood or an automated scanner.' },
+  'failed-login': { title: 'Password guessing', catches: 'Someone failing to log in again and again on the test login page.' },
+  'suspicious-path': { title: 'Snooping for secrets', catches: 'Requests for sensitive-looking pages such as /.env, /admin or /wp-login.php.' },
+  'malformed-request': { title: 'Broken or tricky requests', catches: 'Odd methods, path tricks like ../, null bytes or oversized URLs.' },
+  'not-found-repeat': { title: 'Page guessing', catches: 'Lots of requests for pages that do not exist (HTTP 404).' },
+  'traffic-anomaly': { title: 'Traffic spike', catches: 'Total traffic to a device far above its normal level.' },
+};
+
+/** "Fires at 20 requests per source within 60 seconds"-style summary from the integer params. */
+function thresholdSummary(rule) {
+  const p = rule.params;
+  switch (rule.id) {
+    case 'request-rate':
+      return `Fires at ${p.threshold} requests in ${p.windowSeconds}s`;
+    case 'failed-login':
+      return `Fires at ${p.threshold} failures in ${p.windowSeconds}s`;
+    case 'not-found-repeat':
+      return `Fires at ${p.threshold} missing pages in ${p.windowSeconds}s`;
+    case 'traffic-anomaly':
+      return `Fires above ${p.baselinePerMinute * p.multiplier} requests/min`;
+    case 'suspicious-path':
+      return `${p.patterns.length} watched patterns`;
+    case 'malformed-request':
+      return `Paths over ${p.maxPathLength} chars, ${p.allowedMethods.length} allowed methods`;
+    default:
+      return '';
+  }
+}
 
 function toDraft(rule) {
   const params = {};
@@ -51,6 +84,7 @@ function RuleCard({ rule, stats, isAdmin, onSaved }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [open, setOpen] = useState(false);
   const now = useNow(30000);
 
   useEffect(() => setDraft(toDraft(rule)), [rule]);
@@ -72,37 +106,43 @@ function RuleCard({ rule, stats, isAdmin, onSaved }) {
     }
   }
 
+  const plain = PLAIN_RULES[rule.id] ?? { title: rule.name, catches: '' };
   return (
-    <Card as="article" className={rule.enabled ? '' : 'opacity-80'}>
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-4 py-3">
-        <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-ink">{rule.name}</h3>
-          <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-ink-3">
-            <code>{rule.id}</code>
-            <span>·</span>
-            <span>{categoryLabel(rule.category)}</span>
-          </p>
-        </div>
-        <Toggle
-          checked={rule.enabled}
-          disabled={!isAdmin || busy}
-          onChange={(enabled) => save({ enabled })}
-          label={rule.enabled ? 'Enabled' : 'Disabled'}
-        />
-      </div>
-      <CardBody className="space-y-4">
-        <p className="text-sm text-ink-2">{rule.description.replace(/`/g, '')}</p>
-
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <SeverityBadge severity={rule.severity} />
-          <Badge className="bg-surface-3 text-ink-2 ring-line-strong">action: {rule.action}</Badge>
+    <Card as="article" className={`p-5 ${rule.enabled ? '' : 'opacity-75'}`}>
+      <div className="flex flex-wrap items-start gap-4">
+        <div className="min-w-0 flex-1">
+          <h3 className="font-semibold text-ink">{plain.title}</h3>
+          <p className="mt-0.5 text-sm text-ink-2">{plain.catches}</p>
+          <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs">
+            <SeverityBadge severity={rule.severity} />
+            <Badge className="bg-surface-3 text-ink-2 ring-line-strong">{ACTION_WORDS[rule.action]}</Badge>
+            <span className="text-ink-3">{thresholdSummary(rule)}</span>
+          </div>
           {stats && (
-            <span className="text-ink-3">
-              {formatNumber(stats.matches)} matches in 24h
+            <p className="mt-2 text-xs text-ink-3">
+              {stats.matches ? `Fired ${formatNumber(stats.matches)} time${stats.matches === 1 ? '' : 's'} in 24h` : 'Not fired in 24h'}
               {stats.lastMatchedAt && ` · last ${formatRelative(stats.lastMatchedAt, now)}`}
-            </span>
+            </p>
           )}
         </div>
+        <div className="flex items-center gap-3">
+          <Toggle
+            checked={rule.enabled}
+            disabled={!isAdmin || busy}
+            onChange={(enabled) => save({ enabled })}
+            label={rule.enabled ? 'On' : 'Off'}
+          />
+          <Button size="sm" variant="ghost" icon={open ? ChevronUp : SlidersHorizontal} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+            {open ? 'Close' : 'Tune'}
+          </Button>
+        </div>
+      </div>
+      {message && !dirty && !open && <p className="mt-2 text-xs text-emerald-300">{message}</p>}
+      {open && (
+      <div className="mt-5 space-y-4 border-t border-line pt-5">
+        <p className="text-sm text-ink-3">
+          {rule.description.replace(/`/g, '')} <code className="text-xs">({rule.id} · {categoryLabel(rule.category)})</code>
+        </p>
 
         <fieldset disabled={!isAdmin || busy} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <legend className="sr-only">Rule configuration</legend>
@@ -156,7 +196,8 @@ function RuleCard({ rule, stats, isAdmin, onSaved }) {
             </Button>
           </div>
         )}
-      </CardBody>
+      </div>
+      )}
     </Card>
   );
 }
@@ -205,17 +246,38 @@ export default function RulesPage() {
   return (
     <>
       <PageHeader
-        title="Detection rules"
-        description="Explainable, threshold-based rules evaluated by the backend for every event. Every flagged event records which rule matched and why."
+        title="Rules"
+        description="Each rule watches for one kind of suspicious behaviour. Switch rules on or off, or tune how sensitive they are."
       />
 
       <div className="mb-4 space-y-3">
-        <AdminRequiredNotice action="enable, disable or tune rules" />
+        <AdminRequiredNotice action="change rules" />
       </div>
 
-      <Card className="mb-4">
-        <CardHeader title="Three different protections" icon={Layers} />
-        <CardBody className="grid grid-cols-1 gap-4 text-sm text-ink-2 md:grid-cols-3">
+      <AsyncContent state={rules}>
+        {(list) => (
+          <div className="stagger grid grid-cols-1 gap-4 xl:grid-cols-2">
+            {list.map((rule) => (
+              <RuleCard
+                key={rule.id}
+                rule={rule}
+                stats={statsById.get(rule.id)}
+                isAdmin={isAdmin}
+                onSaved={(updated) => rules.setData((current) => current.map((r) => (r.id === updated.id ? updated : r)))}
+              />
+            ))}
+          </div>
+        )}
+      </AsyncContent>
+
+      <details className="group mt-6 rounded-xl border border-line bg-surface">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4">
+          <span className="flex items-center gap-2 font-medium text-ink">
+            <Layers className="size-4 text-ink-3" aria-hidden="true" /> How detecting differs from blocking
+          </span>
+          <ChevronDown className="size-4 text-ink-3 transition-transform group-open:rotate-180" aria-hidden="true" />
+        </summary>
+        <div className="grid grid-cols-1 gap-4 border-t border-line px-5 py-5 text-sm text-ink-2 md:grid-cols-3">
           <div>
             <p className="font-medium text-ink">API abuse protection</p>
             <p className="mt-1">
@@ -237,29 +299,13 @@ export default function RulesPage() {
               throttle or refuse that client. This is not a network firewall.
             </p>
           </div>
-        </CardBody>
-      </Card>
-
-      <AsyncContent state={rules}>
-        {(list) => (
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-            {list.map((rule) => (
-              <RuleCard
-                key={rule.id}
-                rule={rule}
-                stats={statsById.get(rule.id)}
-                isAdmin={isAdmin}
-                onSaved={(updated) => rules.setData((current) => current.map((r) => (r.id === updated.id ? updated : r)))}
-              />
-            ))}
-          </div>
-        )}
-      </AsyncContent>
+        </div>
+      </details>
 
       <Card className="mt-4" id="enforcement">
         <CardHeader
-          title="Active enforcement decisions"
-          subtitle="Sources currently rate-limited or blocked (in-memory, cleared on backend restart)"
+          title="Slowed or blocked right now"
+          subtitle="Temporary decisions made by the rules. They expire on their own (and reset if the backend restarts)."
           icon={Gauge}
         />
         <EnforcementTable state={stats} />

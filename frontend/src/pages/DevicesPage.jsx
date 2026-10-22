@@ -122,7 +122,7 @@ function DeviceCard({ device, now }) {
           </span>
           <Link
             to={`/events?sourceType=device&deviceId=${encodeURIComponent(device.deviceId)}`}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-sky-300 hover:text-sky-200"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-accent-ink hover:text-accent"
           >
             <ListFilter className="size-3.5" aria-hidden="true" /> View events
           </Link>

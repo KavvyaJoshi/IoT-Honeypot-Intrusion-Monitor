@@ -2,7 +2,7 @@ import { ChevronDown, Search, X } from 'lucide-react';
 import { useId } from 'react';
 
 const fieldBase =
-  'h-9 w-full rounded-md border border-line-strong bg-canvas px-3 text-sm text-ink placeholder:text-ink-3 focus:border-sky-400 focus:outline-none';
+  'h-9 w-full rounded-md border border-line-strong bg-canvas px-3 text-sm text-ink placeholder:text-ink-3 focus:border-accent focus:outline-none';
 
 /** Single-select segmented control (e.g. time range). Uses radio semantics for accessibility. */
 export function SegmentedControl({ label, options, value, onChange, size = 'md' }) {
@@ -16,7 +16,7 @@ export function SegmentedControl({ label, options, value, onChange, size = 'md' 
             key={option.value}
             className={`cursor-pointer select-none rounded px-2.5 font-medium transition-colors ${
               size === 'sm' ? 'py-1 text-xs' : 'py-1.5 text-xs sm:text-sm'
-            } ${active ? 'bg-surface-3 text-ink' : 'text-ink-3 hover:text-ink'} has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-sky-400`}
+            } ${active ? 'bg-surface-3 text-ink' : 'text-ink-3 hover:text-ink'} has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent`}
           >
             <input
               type="radio"
@@ -113,7 +113,7 @@ export function TextArea({ label, hint, className = '', ...props }) {
       </label>
       <textarea
         id={id}
-        className="w-full rounded-md border border-line-strong bg-canvas px-3 py-2 font-mono text-xs text-ink placeholder:text-ink-3 focus:border-sky-400 focus:outline-none"
+        className="w-full rounded-md border border-line-strong bg-canvas px-3 py-2 font-mono text-xs text-ink placeholder:text-ink-3 focus:border-accent focus:outline-none"
         {...props}
       />
       {hint && <p className="mt-1 text-xs text-ink-3">{hint}</p>}
@@ -133,7 +133,7 @@ export function Toggle({ checked, onChange, label, disabled = false, srOnlyLabel
           disabled={disabled}
           onChange={(e) => onChange(e.target.checked)}
         />
-        <span className="h-5 w-9 rounded-full bg-surface-3 ring-1 ring-line-strong transition-colors peer-checked:bg-emerald-500/80 peer-focus-visible:outline-2 peer-focus-visible:outline-sky-400" />
+        <span className="h-5 w-9 rounded-full bg-surface-3 ring-1 ring-line-strong transition-colors peer-checked:bg-emerald-500/80 peer-focus-visible:outline-2 peer-focus-visible:outline-accent" />
         <span className="absolute left-0.5 top-0.5 size-4 rounded-full bg-ink transition-transform peer-checked:translate-x-4" />
       </span>
       <span className={srOnlyLabel ? 'sr-only' : 'text-sm text-ink-2'}>{label}</span>

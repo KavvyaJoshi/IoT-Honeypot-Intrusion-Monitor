@@ -209,7 +209,7 @@ export default function SettingsPage() {
             subtitle="Current values; edit them on the Detection rules page"
             icon={Activity}
             actions={
-              <Link to="/rules" className="text-xs font-medium text-sky-300 hover:text-sky-200">
+              <Link to="/rules" className="text-xs font-medium text-accent-ink hover:text-accent">
                 Edit rules
               </Link>
             }

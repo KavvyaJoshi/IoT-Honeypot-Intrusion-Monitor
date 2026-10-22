@@ -1,7 +1,7 @@
 export function Card({ as: Tag = 'section', className = '', children, ...rest }) {
   return (
     // min-w-0 stops wide children (tables) from stretching grid/flex columns past the viewport.
-    <Tag className={`min-w-0 rounded-lg border border-line bg-surface ${className}`} {...rest}>
+    <Tag className={`min-w-0 rounded-xl border border-line bg-surface ${className}`} {...rest}>
       {children}
     </Tag>
   );
@@ -9,7 +9,7 @@ export function Card({ as: Tag = 'section', className = '', children, ...rest })
 
 export function CardHeader({ title, subtitle, icon: Icon, actions, className = '' }) {
   return (
-    <div className={`flex flex-wrap items-start justify-between gap-3 border-b border-line px-4 py-3 ${className}`}>
+    <div className={`flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4 ${className}`}>
       <div className="min-w-0">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
           {Icon && <Icon className="size-4 shrink-0 text-ink-3" aria-hidden="true" />}
@@ -28,10 +28,10 @@ export function CardBody({ className = '', children }) {
 
 export function PageHeader({ title, description, actions }) {
   return (
-    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
-        <h1 className="text-xl font-semibold tracking-tight text-ink">{title}</h1>
-        {description && <p className="mt-1 max-w-3xl text-sm text-ink-2">{description}</p>}
+        <h1 className="text-3xl font-semibold tracking-tight text-ink">{title}</h1>
+        {description && <p className="mt-2 max-w-2xl text-ink-2">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>

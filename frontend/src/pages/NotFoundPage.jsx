@@ -11,7 +11,7 @@ export default function NotFoundPage() {
         title="Page not found"
         description="This dashboard page does not exist."
         action={
-          <Link to="/" className="text-sm font-medium text-sky-300 hover:text-sky-200">
+          <Link to="/" className="text-sm font-medium text-accent-ink hover:text-accent">
             Back to overview
           </Link>
         }

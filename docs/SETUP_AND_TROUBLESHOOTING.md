@@ -83,7 +83,7 @@ If you serve `dist` from another server, set `VITE_API_BASE_URL` before building
 
 ## Resetting data
 
-- Simulated data only: **Controlled testing → Reset demo data** (or `POST /api/simulator/reset`).
+- Simulated data only: **Practice lab → Lab tools → Delete simulated events** (or `POST /api/simulator/reset`).
 - Everything (development only): `mongosh iot_honeypot --eval "db.dropDatabase()"`, or delete the `iot_honeypot` database in MongoDB Compass. Defaults are re-seeded on the next backend start.
 
 `mongosh` is a separate download since MongoDB 6 (https://www.mongodb.com/try/download/shell). MongoDB Compass works just as well for inspecting the `events`, `devices`, `rules` and `settings` collections.

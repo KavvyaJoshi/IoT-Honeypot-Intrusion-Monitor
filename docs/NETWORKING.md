@@ -19,7 +19,7 @@ The dashboard runs on the same laptop as the backend and reaches it through `loc
 | **Laptop-only** | `127.0.0.1` | Simulator demos, no ESP8266, or an untrusted network | API reachable only from this laptop |
 | **LAN device mode** | `0.0.0.0` (default) | The ESP8266 must report to the backend | API listens on every adapter; Windows Firewall is the boundary, so allow only what is needed (below) |
 
-The simulator works in both modes and does not depend on the ESP8266 or on Wi-Fi. If the device cannot connect during the demo, switch to the **Controlled testing** page. Simulated events are always labelled **Simulated** and never shown as ESP8266 traffic.
+The simulator works in both modes and does not depend on the ESP8266 or on Wi-Fi. If the device cannot connect during the demo, switch to the **Practice lab** page. Simulated events are always labelled **Simulated** and never shown as ESP8266 traffic.
 
 Security implications of `HOST=0.0.0.0`: anyone on the same network who can get through the firewall can call the read-only API endpoints and open the dashboard's live stream data. Write endpoints still need the device key or admin token. Keep the firewall exception narrow, prefer your own hotspot, and switch back to `HOST=127.0.0.1` when you are not testing the device. Never port-forward, use public tunnels (ngrok and similar), or disable the firewall.
 

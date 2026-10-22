@@ -70,7 +70,10 @@ export function StatusIndicator({ status, label, className = '' }) {
   const style = STATUS_STYLES[status] ?? STATUS_STYLES.unknown;
   return (
     <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${style.text} ${className}`}>
-      <span className={`size-2 shrink-0 rounded-full ${style.dot}`} aria-hidden="true" />
+      <span
+        className={`size-2 shrink-0 rounded-full ${style.dot} ${status === 'ok' || status === 'online' ? 'breathe' : ''}`}
+        aria-hidden="true"
+      />
       {label ?? style.label}
     </span>
   );

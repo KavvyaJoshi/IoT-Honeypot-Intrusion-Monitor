@@ -1,8 +1,10 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { AppShell } from './components/layout/AppShell.jsx';
 import { LoadingState } from './components/ui/States.jsx';
+import { ToastProvider } from './components/ui/Toast.jsx';
 import { SystemProvider } from './context/SystemContext.jsx';
+import { MissionsProvider } from './game/MissionsContext.jsx';
 
 // Route-level code splitting keeps the charting library out of the initial bundle.
 const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx'));
@@ -31,7 +33,8 @@ export function AppRoutes() {
         <Route path="analytics" element={page(AnalyticsPage)} />
         <Route path="devices" element={page(DevicesPage)} />
         <Route path="rules" element={page(RulesPage)} />
-        <Route path="simulator" element={page(SimulatorPage)} />
+        <Route path="lab" element={page(SimulatorPage)} />
+        <Route path="simulator" element={<Navigate to="/lab" replace />} />
         <Route path="settings" element={page(SettingsPage)} />
         <Route path="*" element={page(NotFoundPage)} />
       </Route>
@@ -42,9 +45,13 @@ export function AppRoutes() {
 export default function App() {
   return (
     <SystemProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <ToastProvider>
+        <MissionsProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </MissionsProvider>
+      </ToastProvider>
     </SystemProvider>
   );
 }

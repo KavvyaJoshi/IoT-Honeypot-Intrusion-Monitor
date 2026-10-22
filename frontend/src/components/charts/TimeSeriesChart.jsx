@@ -67,7 +67,7 @@ export function TimeSeriesChart({ data, series, bucketMs, height = 240, stacked 
                     name={s.label}
                     stackId={stacked ? 'stack' : undefined}
                     fill={s.color}
-                    stroke="#111a2e"
+                    stroke="#0f0f0f"
                     strokeWidth={stacked ? 1 : 0}
                     radius={!stacked || s.key === lastBarKey ? [4, 4, 0, 0] : 0}
                     maxBarSize={28}
@@ -85,7 +85,7 @@ export function TimeSeriesChart({ data, series, bucketMs, height = 240, stacked 
                     stroke={s.color}
                     strokeWidth={2}
                     dot={false}
-                    activeDot={{ r: 4, stroke: '#111a2e', strokeWidth: 2 }}
+                    activeDot={{ r: 4, stroke: '#0f0f0f', strokeWidth: 2 }}
                     isAnimationActive={false}
                   />
                 );
@@ -100,7 +100,7 @@ export function TimeSeriesChart({ data, series, bucketMs, height = 240, stacked 
                   strokeWidth={2}
                   fill={s.color}
                   fillOpacity={0.14}
-                  activeDot={{ r: 4, stroke: '#111a2e', strokeWidth: 2 }}
+                  activeDot={{ r: 4, stroke: '#0f0f0f', strokeWidth: 2 }}
                   isAnimationActive={false}
                 />
               );

@@ -64,7 +64,7 @@ export function AdminRequiredNotice({ action = 'use this feature' }) {
   const { isAdmin, openAdminDialog } = useSystem();
   if (isAdmin) return null;
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-sky-500/30 bg-sky-500/10 px-3 py-2.5 text-sm text-sky-100">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-accent/30 bg-accent/[0.07] px-3 py-2.5 text-sm text-accent-ink">
       <span className="flex items-center gap-2">
         <KeyRound className="size-4 shrink-0" aria-hidden="true" />
         Admin token required to {action}.

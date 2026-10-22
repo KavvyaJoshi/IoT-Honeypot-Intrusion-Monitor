@@ -1,20 +1,26 @@
 @import 'tailwindcss';
 
-/* Design tokens. The dashboard is dark-only by design (SOC style); chart series colours live in
-   src/lib/constants.js and were validated for contrast and colour-vision separation on --color-surface. */
+/* "Black & signal": true-black base, warm white text, one electric-lime accent used sparingly
+   (primary actions, active nav, XP, the mascot). Status colours (green/amber/red) are reserved
+   for meaning. Chart series colours live in src/lib/constants.js, validated on --color-surface. */
 @theme {
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Mono', 'JetBrains Mono', Consolas, 'Liberation Mono', monospace;
+  --font-sans: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Cascadia Mono', ui-monospace, 'JetBrains Mono', Consolas, 'Liberation Mono', monospace;
 
-  --color-canvas: #0a1020;
-  --color-surface: #111a2e;
-  --color-surface-2: #16223b;
-  --color-surface-3: #1c2a47;
-  --color-line: #1f2c47;
-  --color-line-strong: #2c3c5e;
-  --color-ink: #e6ebf5;
-  --color-ink-2: #aab5ca;
-  --color-ink-3: #7d89a3;
+  --color-canvas: #000000;
+  --color-surface: #0f0f0f;
+  --color-surface-2: #161616;
+  --color-surface-3: #212121;
+  --color-line: #1f1f1f;
+  --color-line-strong: #333333;
+  --color-ink: #f4f1ea;
+  --color-ink-2: #b9b4aa;
+  --color-ink-3: #85807a;
+
+  --color-accent: #c8f135;
+  --color-accent-strong: #b3dc1f;
+  --color-accent-ink: #dcf78a;
+  --color-on-accent: #0b0f00;
 }
 
 :root {
@@ -33,9 +39,12 @@ body {
   min-height: 100vh;
 }
 
-/* Visible keyboard focus everywhere. */
+::selection {
+  background: rgb(200 241 53 / 0.3);
+}
+
 :focus-visible {
-  outline: 2px solid #38bdf8;
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
@@ -43,26 +52,115 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Brief highlight for rows that just arrived over Socket.IO. */
+/* Small uppercase mono labels: the "instrument panel" voice. */
+.label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+/* Faint dot grid, used once behind the home hero (radar-screen feel). */
+.dot-grid {
+  background-image: radial-gradient(rgb(244 241 234 / 0.07) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-in { animation: page-in 0.38s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+/* Children of .stagger rise in one after another. */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+.stagger > * { animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.stagger > *:nth-child(3) { animation-delay: 0.14s; }
+.stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger > *:nth-child(5) { animation-delay: 0.26s; }
+.stagger > *:nth-child(6) { animation-delay: 0.32s; }
+.stagger > *:nth-child(n + 7) { animation-delay: 0.38s; }
+
+.lift { transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease; }
+.lift:hover { transform: translateY(-3px); }
+
 @keyframes row-arrive {
-  from {
-    background-color: rgb(56 189 248 / 0.16);
-  }
-  to {
-    background-color: transparent;
-  }
+  from { background-color: rgb(200 241 53 / 0.12); }
+  to { background-color: transparent; }
 }
-.row-arrive {
-  animation: row-arrive 2.4s ease-out;
+.row-arrive { animation: row-arrive 2.4s ease-out; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(24px) scale(0.96); }
+  to { opacity: 1; transform: none; }
 }
+.toast-in { animation: toast-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.2); }
+
+@keyframes pop {
+  0% { transform: scale(0.6) rotate(-12deg); }
+  60% { transform: scale(1.18) rotate(6deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.pop { animation: pop 0.55s cubic-bezier(0.3, 1.4, 0.4, 1); }
+
+/* Live status dots breathe. */
+@keyframes breathe {
+  0% { box-shadow: 0 0 0 0 currentColor; }
+  70% { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.breathe { animation: breathe 2.2s ease-out infinite; }
+
+/* Mascot: Pip the sentry bot. */
+@keyframes float-calm { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes float-alert { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-3px, -2px) rotate(-5deg); } 75% { transform: translate(3px, -3px) rotate(5deg); } }
+@keyframes party-spin { 0% { transform: translateY(0) rotate(0); } 35% { transform: translateY(-18px) rotate(-15deg); } 70% { transform: translateY(-4px) rotate(360deg); } 100% { transform: translateY(0) rotate(360deg); } }
+@keyframes doze { 0%, 100% { transform: translateY(3px) rotate(-7deg); } 50% { transform: translateY(6px) rotate(-5deg); } }
+@keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.08); } }
+@keyframes antenna { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes shadow-pulse { 0%, 100% { transform: scaleX(1); opacity: 0.5; } 50% { transform: scaleX(0.82); opacity: 0.3; } }
+@keyframes zzz { 0% { opacity: 0; transform: translate(0, 0) scale(0.6); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(14px, -26px) scale(1.1); } }
+@keyframes bubble-in { from { opacity: 0; transform: translateY(6px) scale(0.92); } to { opacity: 1; transform: none; } }
+@keyframes scan { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.bot-calm { animation: float-calm 2.8s ease-in-out infinite; }
+.bot-alert { animation: float-alert 0.5s ease-in-out infinite; }
+.bot-party { animation: party-spin 0.9s cubic-bezier(0.3, 1.3, 0.4, 1) 2; }
+.bot-sleep { animation: doze 3.2s ease-in-out infinite; }
+.bot-blink { transform-box: fill-box; transform-origin: center; animation: blink 4.8s infinite; }
+.bot-antenna { animation: antenna 1.6s ease-in-out infinite; }
+.bot-alert .bot-antenna { animation-duration: 0.35s; }
+.bot-shadow { transform-box: fill-box; transform-origin: center; animation: shadow-pulse 2.8s ease-in-out infinite; }
+.bot-zzz { animation: zzz 2.4s ease-out infinite; }
+.bubble-in { animation: bubble-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.2); }
+.radar-sweep { transform-origin: 50% 50%; animation: scan 4s linear infinite; }
+
+/* Confetti pieces get their trajectory from CSS variables set inline. */
+@keyframes confetti {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); }
+}
+.confetti-piece { animation: confetti var(--dur, 1.4s) cubic-bezier(0.15, 0.6, 0.35, 1) forwards; }
 
 @media (prefers-reduced-motion: reduce) {
-  .row-arrive {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
+  .lift:hover { transform: none; }
 }
 
-/* Recharts: keep focus rings off SVG wrappers (keyboard focus is on the table toggle). */
 .recharts-wrapper:focus,
 .recharts-surface:focus {
   outline: none;

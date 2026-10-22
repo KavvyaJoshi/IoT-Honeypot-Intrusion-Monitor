@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { emptyStats, makeEvent, renderWithProviders } from '../test/utils.jsx';
 
@@ -36,21 +37,28 @@ describe('DashboardPage', () => {
     api.devices.mockResolvedValue({ data: [{ deviceId: 'esp-lab-01', status: 'online', lastHeartbeatAt: new Date().toISOString() }] });
 
     renderWithProviders(<DashboardPage />);
-    expect(await screen.findByText('42')).toBeInTheDocument();
+    expect(await screen.findByText('3 high-risk alerts need a look.')).toBeInTheDocument();
+    expect(screen.getAllByText('42').length).toBeGreaterThan(0);
     expect(screen.getByText('7')).toBeInTheDocument();
-    expect(screen.getByText('1 / 1')).toBeInTheDocument();
-    expect(api.eventStats).toHaveBeenCalledWith({ range: '1h', sourceType: undefined });
+    expect(screen.getByRole('img', { name: /Pip the sentry bot, on alert/ })).toBeInTheDocument();
+    expect(api.eventStats).toHaveBeenCalledWith({ range: '1h' });
   });
 
-  it('shows empty states when no events exist', async () => {
+  it('says "All quiet" when nothing was flagged', async () => {
+    api.eventStats.mockResolvedValue({ ...emptyStats(), totals: { ...emptyStats().totals, total: 12 } });
+    api.events.mockResolvedValue({ data: [makeEvent()], pagination: { page: 1, limit: 6, total: 1, totalPages: 1 } });
+    renderWithProviders(<DashboardPage />);
+    expect(await screen.findByText('All quiet.')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /calm/ })).toBeInTheDocument();
+  });
+
+  it('shows a getting-started guide before the first event', async () => {
     api.eventStats.mockResolvedValue(emptyStats());
-    api.events.mockResolvedValue({ data: [], pagination: { page: 1, limit: 8, total: 0, totalPages: 1 } });
-    api.devices.mockResolvedValue({ data: [] });
+    api.events.mockResolvedValue({ data: [], pagination: { page: 1, limit: 6, total: 0, totalPages: 1 } });
 
     renderWithProviders(<DashboardPage />);
-    expect(await screen.findByText('No requests in this range')).toBeInTheDocument();
-    expect(screen.getByText('No events recorded')).toBeInTheDocument();
-    expect(screen.getByText('No device registered yet')).toBeInTheDocument();
+    expect(await screen.findByText("Welcome! Let's catch your first signal.")).toBeInTheDocument();
+    expect(screen.getByText('No alerts yet')).toBeInTheDocument();
   });
 
   it('shows an actionable error when the API is down', async () => {
@@ -64,14 +72,27 @@ describe('DashboardPage', () => {
   });
 });
 
+describe('EventsPage quick filters', () => {
+  it('applies a preset chip to the API query', async () => {
+    api.events.mockResolvedValue({ data: [], pagination: { page: 1, limit: 25, total: 0, totalPages: 1 } });
+    renderWithProviders(<EventsPage />, { route: '/events' });
+    await screen.findByText('No events recorded yet');
+    await userEvent.click(screen.getByRole('button', { name: 'High risk' }));
+    await waitFor(() => expect(api.events).toHaveBeenLastCalledWith(expect.objectContaining({ severity: 'high,critical' })));
+    expect(screen.getByRole('button', { name: 'High risk' })).toHaveAttribute('aria-pressed', 'true');
+  });
+});
+
 describe('EventsPage', () => {
   it('renders events and passes URL filters to the API', async () => {
     api.events.mockResolvedValue({
-      data: [makeEvent({ id: 'x', path: '/.env', severity: 'medium', classification: 'suspicious', actionTaken: 'logged' })],
+      data: [
+        makeEvent({ id: 'x', path: '/.env', category: 'suspicious-path', severity: 'medium', classification: 'suspicious', actionTaken: 'logged' }),
+      ],
       pagination: { page: 1, limit: 25, total: 1, totalPages: 1 },
     });
     renderWithProviders(<EventsPage />, { route: '/events?severity=high,critical&sourceType=device' });
-    expect(await screen.findByText('/.env')).toBeInTheDocument();
+    expect(await screen.findByText('Looked for a sensitive-looking page (/.env)')).toBeInTheDocument();
     expect(api.events).toHaveBeenCalledWith(expect.objectContaining({ severity: 'high,critical', sourceType: 'device', page: 1 }));
   });
 
@@ -185,8 +206,8 @@ describe('SimulatorPage', () => {
     api.scenarios.mockResolvedValue([{ id: 'normal', label: 'Normal request', description: 'One request', relatedRules: [] }]);
     renderWithProviders(<SimulatorPage />);
     expect(await screen.findByText('Normal request')).toBeInTheDocument();
-    expect(screen.getByText(/Admin token required to run scenarios/)).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByRole('button', { name: /run scenario/i })).toBeDisabled());
+    expect(screen.getByText(/Admin token required to run practice scenarios/)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: /^run$/i })).toBeDisabled());
   });
 
   it('shows a disabled state when the server disables the simulator', () => {

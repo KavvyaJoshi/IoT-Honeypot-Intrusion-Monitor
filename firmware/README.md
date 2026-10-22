@@ -182,7 +182,7 @@ int reportObservation(const String& clientIp, const String& method, const String
 
 ## Testing the contract without a board
 
-Run these from the laptop. They create a real device record named `manual-test-device`, which shows on the Devices page as an ESP8266 because it uses the device endpoints. Use the **Controlled testing** page instead if you want clearly simulated data.
+Run these from the laptop. They create a real device record named `manual-test-device`, which shows on the Devices page as an ESP8266 because it uses the device endpoints. Use the **Practice lab** page instead if you want clearly simulated data.
 
 ```powershell
 $key = "<DEVICE_API_KEY from backend/.env>"

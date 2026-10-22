@@ -53,7 +53,7 @@ export const ACTION_DESCRIPTIONS = {
 
 export const SOURCE_META = {
   device: { label: 'ESP8266', icon: Cpu, badge: 'bg-cyan-500/12 text-cyan-300 ring-cyan-400/30' },
-  simulator: { label: 'Simulated', icon: FlaskConical, badge: 'bg-violet-500/15 text-violet-300 ring-violet-400/35' },
+  simulator: { label: 'Simulated', icon: FlaskConical, badge: 'bg-fuchsia-500/15 text-fuchsia-300 ring-fuchsia-400/35' },
   backend: { label: 'Backend', icon: Server, badge: 'bg-slate-500/15 text-slate-300 ring-slate-400/25' },
 };
 
@@ -85,7 +85,7 @@ export const SOURCE_FILTER_OPTIONS = [
 ];
 
 /**
- * Chart series colours (validated with the dataviz palette checker on #111a2e: lightness band,
+ * Chart series colours (validated with the dataviz palette checker on #161921: lightness band,
  * chroma, colour-vision separation and >= 3:1 contrast). Amber, orange and red never appear
  * as neighbouring series because they cannot be told apart reliably.
  */
@@ -96,12 +96,12 @@ export const CHART_COLORS = {
   logged: '#3987e5',
   blocked: '#e66767',
   apiRateLimited: '#9085e9',
-  simulator: '#9085e9',
+  simulator: '#d55181',
   single: '#3987e5',
-  grid: '#1f2c47',
-  axis: '#2c3c5e',
-  tick: '#7d89a3',
+  grid: '#232733',
+  axis: '#323847',
+  tick: '#838ba0',
 };
 
-/** Fixed categorical order for device series; violet is reserved for the simulator series. */
-export const DEVICE_SERIES_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#e66767'];
+/** Fixed categorical order for device series; magenta is reserved for the simulator series. */
+export const DEVICE_SERIES_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#9085e9', '#008300'];

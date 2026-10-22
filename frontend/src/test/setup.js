@@ -12,6 +12,18 @@ class ResizeObserverStub {
 }
 globalThis.ResizeObserver = globalThis.ResizeObserver ?? ResizeObserverStub;
 
+// Report "reduced motion" so count-ups and mascot tracking settle instantly in tests.
+window.matchMedia =
+  window.matchMedia ??
+  ((query) => ({
+    matches: query.includes('prefers-reduced-motion'),
+    media: query,
+    addEventListener() {},
+    removeEventListener() {},
+    addListener() {},
+    removeListener() {},
+  }));
+
 // The real Socket.IO client is never opened in tests.
 vi.mock('../api/socket.js', () => {
   const listeners = new Map();

@@ -1,5 +1,6 @@
 import { ArrowLeft, Braces, Check, Copy } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useMissions } from '../game/MissionsContext.jsx';
 import { Link, useParams } from 'react-router';
 import { errorCode } from '../api/client.js';
 import { api } from '../api/endpoints.js';
@@ -15,6 +16,11 @@ export default function EventDetailPage() {
   const { id } = useParams();
   const event = useApi(() => api.event(id), [id]);
   const [copied, setCopied] = useState(false);
+  const { recordAction } = useMissions();
+
+  useEffect(() => {
+    if (event.data && event.data.classification !== 'normal') recordAction('investigate');
+  }, [event.data, recordAction]);
 
   async function copyJson() {
     try {

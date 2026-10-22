@@ -43,12 +43,12 @@ Override the test database with `MONGODB_URI_TEST`, e.g. `$env:MONGODB_URI_TEST=
 1. Start MongoDB, the backend and the frontend ([setup guide](SETUP_AND_TROUBLESHOOTING.md)).
 2. Check the top bar: **API Up · DB Connected · Stream Live**.
 3. **Unlock admin** with `ADMIN_TOKEN`.
-4. Open **Controlled testing** and run each scenario. Open **Security events** in a second tab: rows appear live with a brief highlight, without reloading.
+4. Open **Practice lab** and run each scenario. Open **Events** in a second tab: rows appear live with a brief highlight, without reloading.
 5. Expand a blocked `/login` row, then **Open full event record**. The Authorization and Cookie headers show `[REDACTED]`, and the query shows `password=[REDACTED]`.
 6. **Detection rules**: lower `request-rate` → threshold to 5, then run *Rate-limit threshold demonstration*. More events are rate-limited, and the active decision appears under *Active enforcement decisions*.
-7. **Controlled testing → API rate limiter demonstration**: 5 × 200, then 429s.
+7. **Practice lab → API rate limiter demonstration**: 5 × 200, then 429s.
 8. Stop MongoDB (`Stop-Service MongoDB`, admin PowerShell). The amber banner appears and running a scenario shows a 503 error. Start it again; the banner clears within seconds.
-9. **Reset demo data**: confirm, and simulated events disappear while device events stay.
+9. **Delete simulated events** (Practice lab → Lab tools): confirm, and simulated events disappear while device events stay.
 
 ### With PowerShell (raw API)
 
@@ -72,7 +72,7 @@ Preparation (before the session)
 - [ ] Backend and frontend running; dashboard open; admin unlocked.
 - [ ] Optional: the ESP8266 is flashed, on the same Wi-Fi, and shows **Online** on Devices. On the demo network: `npm run network-check`, update the board with the serial `url` command if the IP changed, run serial `test`, and do the phone-browser check of `/api/health` ([NETWORKING.md](NETWORKING.md#before-and-after-the-demo)).
 - [ ] Firewall: only the scoped `IoT Honeypot` rule (remove it after the demo).
-- [ ] Start from a clean slate: **Reset demo data**.
+- [ ] Start from a clean slate: **Delete simulated events** (Practice lab → Lab tools).
 
 During the demo
 1. [ ] **Architecture**: show the Mermaid diagram in docs/ARCHITECTURE.md. ESP8266/simulator → validation → normalization/redaction → detection → MongoDB → Socket.IO → dashboard.
@@ -84,11 +84,11 @@ During the demo
 7. [ ] **Rate-limit threshold**: requests 20-25 are `Rate-limited`. Show the active decision on Detection rules, then turn on *Reuse last source* and run *Normal request*: it is still rate-limited (active enforcement).
 8. [ ] **API 429 demo**: 5 accepted, then 429s. Explain API abuse protection vs. detection vs. application-layer blocking (Rules page card).
 9. [ ] **Explainable, configurable rules**: change a threshold, save, re-run, and show the different outcome.
-10. [ ] **Simulated vs. real**: filter Security events by Source = Simulator / ESP8266. Simulated rows carry the violet badge and TEST-NET IPs.
+10. [ ] **Simulated vs. real**: filter Events by Source = Simulator / ESP8266. Simulated rows carry the violet badge and TEST-NET IPs.
 11. [ ] **Analytics**: time ranges, each chart's Table view, the activity-by-source chart.
 12. [ ] **Resilience**: stop MongoDB. The banner appears, writes return 503 and nothing is "fake stored". Restart it and the system recovers.
 13. [ ] **Security**: wrong admin token rejected; settings never show secrets; `.env` not in the repo.
-14. [ ] **Reset demo data**: only simulated events are deleted.
+14. [ ] **Delete simulated events** (Practice lab → Lab tools): only simulated events are deleted.
 
 Points to state honestly
 - Detection rules are threshold heuristics over what the firmware reports. They are not complete intrusion detection and do not identify attackers.

@@ -63,7 +63,7 @@ describe('EventTable', () => {
     const rows = screen.getAllByRole('row').slice(1);
     expect(within(rows[0]).getByText('Simulated')).toBeInTheDocument();
     expect(within(rows[1]).getByText('Medium')).toBeInTheDocument();
-    expect(within(rows[1]).getByText(/sensitive-looking pattern/)).toBeInTheDocument();
+    expect(within(rows[1]).getByText('Looked for a sensitive-looking page (/.env)')).toBeInTheDocument();
     expect(within(rows[2]).getByText('Blocked')).toBeInTheDocument();
     expect(rows[2].className).toContain('border-l-red-500');
   });
