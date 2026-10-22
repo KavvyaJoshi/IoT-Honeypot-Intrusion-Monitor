@@ -1,19 +1,18 @@
-import { Activity, Cpu, Database, FileCog, HeartPulse, Radio, Save, Server, SlidersHorizontal } from 'lucide-react';
+import { Cpu, Database, FileCog, HeartPulse, Radio, Save, Server, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
-import { describeError } from '../api/client.js';
-import { api } from '../api/endpoints.js';
-import { SOCKET_EVENTS } from '../api/socket.js';
-import { AdminRequiredNotice } from '../components/AdminDialog.jsx';
-import { StatusIndicator } from '../components/ui/Badge.jsx';
-import { Button } from '../components/ui/Button.jsx';
-import { Card, CardBody, CardHeader, KeyValueList, PageHeader } from '../components/ui/Card.jsx';
-import { TextArea, TextField } from '../components/ui/Controls.jsx';
-import { AsyncContent } from '../components/ui/States.jsx';
-import { useSystem } from '../context/SystemContext.jsx';
-import { useApi } from '../hooks/useApi.js';
-import { useNow, useThrottledSocketRefresh } from '../hooks/useSocket.js';
-import { formatDateTime, formatDuration, formatRelative } from '../lib/format.js';
+import { describeError } from '../../api/client.js';
+import { api } from '../../api/endpoints.js';
+import { SOCKET_EVENTS } from '../../api/socket.js';
+import { AdminRequiredNotice } from './AdminAccess.jsx';
+import { StatusIndicator } from '../ui/Badge.jsx';
+import { Button } from '../ui/Button.jsx';
+import { Card, CardBody, CardHeader, KeyValueList } from '../ui/Card.jsx';
+import { TextArea, TextField } from '../ui/Controls.jsx';
+import { AsyncContent } from '../ui/States.jsx';
+import { useSystem } from '../../context/SystemContext.jsx';
+import { useApi } from '../../hooks/useApi.js';
+import { useNow, useThrottledSocketRefresh } from '../../hooks/useSocket.js';
+import { formatDateTime, formatDuration, formatRelative } from '../../lib/format.js';
 
 const NUMBER_FIELDS = [
   { key: 'heartbeatTimeoutSeconds', label: 'Heartbeat timeout (s)', min: 15, max: 3600, hint: 'Device shows Offline after this long without a heartbeat.' },
@@ -180,16 +179,13 @@ function RuntimeSettingsForm({ settings, onSaved }) {
   );
 }
 
-export default function SettingsPage() {
+/** System health, runtime settings and read-only environment config (Admin panel section). */
+export function SettingsSection() {
   const settings = useApi(() => api.settings(), []);
-  const rules = useApi(() => api.rules(), []);
   useThrottledSocketRefresh(SOCKET_EVENTS.SETTINGS_UPDATED, settings.refetch);
-  useThrottledSocketRefresh(SOCKET_EVENTS.RULES_UPDATED, rules.refetch);
 
   return (
     <>
-      <PageHeader title="Settings & system health" description="Connection status, runtime settings and environment configuration. Secrets are never displayed." />
-
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <SystemHealth />
 
@@ -201,37 +197,6 @@ export default function SettingsPage() {
               {(data) => <RuntimeSettingsForm settings={data.runtime} onSaved={(updated) => settings.setData(() => updated)} />}
             </AsyncContent>
           </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader
-            title="Detection thresholds"
-            subtitle="Current values; edit them on the Detection rules page"
-            icon={Activity}
-            actions={
-              <Link to="/rules" className="text-xs font-medium text-accent-ink hover:text-accent">
-                Edit rules
-              </Link>
-            }
-          />
-          <AsyncContent state={rules} compact>
-            {(list) => (
-              <ul className="divide-y divide-line px-4">
-                {list.map((rule) => (
-                  <li key={rule.id} className="flex flex-wrap items-baseline justify-between gap-2 py-2.5 text-sm">
-                    <span className={rule.enabled ? 'text-ink' : 'text-ink-3 line-through'}>{rule.name}</span>
-                    <span className="font-mono text-xs text-ink-2">
-                      {rule.paramFields
-                        .filter((f) => f.type === 'integer')
-                        .map((f) => `${f.key}=${rule.params[f.key]}`)
-                        .join(' · ')}
-                      {!rule.enabled && ' (disabled)'}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </AsyncContent>
         </Card>
 
         <Card>

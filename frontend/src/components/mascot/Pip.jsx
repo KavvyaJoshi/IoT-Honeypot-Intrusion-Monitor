@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-const EYE_COLORS = { calm: '#c8f135', party: '#c8f135', alert: '#ff5d5d', sleep: '#c8f135' };
+const EYE_COLORS = { calm: '#f4f1ea', party: '#f4f1ea', alert: '#ff5d5d', sleep: '#f4f1ea' };
 const MOOD_CLASS = { calm: 'bot-calm', alert: 'bot-alert', party: 'bot-party', sleep: 'bot-sleep' };
 
 function prefersReducedMotion() {
@@ -57,7 +57,7 @@ export function Pip({ mood = 'calm', size = 120, trackPointer = true, className 
       <g className={MOOD_CLASS[mood]} style={{ transformOrigin: '60px 70px', transformBox: 'view-box' }}>
         {/* antenna */}
         <line x1="60" y1="24" x2="60" y2="11" stroke="#3a3a3a" strokeWidth="3" strokeLinecap="round" />
-        <circle className="bot-antenna" cx="60" cy="8" r="4.5" fill={mood === 'alert' ? '#ff5d5d' : '#c8f135'} />
+        <circle className="bot-antenna" cx="60" cy="8" r="4.5" fill={mood === 'alert' ? '#ff5d5d' : '#f4f1ea'} />
 
         {/* ears */}
         <rect x="14" y="44" width="9" height="20" rx="3.5" fill="#2a2a2a" />
@@ -86,7 +86,7 @@ export function Pip({ mood = 'calm', size = 120, trackPointer = true, className 
         {/* neck + body */}
         <rect x="52" y="85" width="16" height="6" rx="2" fill="#2a2a2a" />
         <rect x="37" y="90" width="46" height="34" rx="13" fill="#1b1b1b" stroke="#3a3a3a" strokeWidth="2" />
-        <circle cx="60" cy="106" r="4" fill={mood === 'alert' ? '#ff5d5d' : '#c8f135'} opacity="0.9" />
+        <circle cx="60" cy="106" r="4" fill={mood === 'alert' ? '#ff5d5d' : '#f4f1ea'} opacity="0.9" />
 
         {/* arms */}
         <g style={{ transformOrigin: '38px 98px', transform: armsUp ? 'rotate(130deg)' : 'rotate(20deg)', transition: 'transform 0.3s' }}>

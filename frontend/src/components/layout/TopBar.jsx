@@ -1,4 +1,4 @@
-import { ChevronDown, Cpu, Lock, LockOpen, Menu } from 'lucide-react';
+import { ChevronDown, Cpu, Menu } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { api } from '../../api/endpoints.js';
@@ -72,7 +72,7 @@ function SystemStatus() {
               </li>
             ))}
           </ul>
-          <Link to="/settings" onClick={() => setOpen(false)} className="mt-1 block rounded-lg px-2.5 py-2 text-xs text-accent-ink hover:bg-surface-3">
+          <Link to="/admin?tab=settings" onClick={() => setOpen(false)} className="mt-1 block rounded-lg px-2.5 py-2 text-xs text-accent-ink hover:bg-surface-3">
             Full system health →
           </Link>
         </div>
@@ -103,8 +103,6 @@ function DevicePill() {
 }
 
 export function TopBar({ onOpenNav }) {
-  const { isAdmin, openAdminDialog, lockAdmin } = useSystem();
-
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center gap-2 border-b border-line bg-canvas/85 px-4 backdrop-blur sm:gap-3 sm:px-8">
       <button
@@ -122,27 +120,6 @@ export function TopBar({ onOpenNav }) {
       </div>
 
       <RankChip />
-      {isAdmin ? (
-        <button
-          type="button"
-          onClick={lockAdmin}
-          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-200 hover:bg-emerald-500/20"
-          title="Admin actions unlocked for this tab. Click to lock."
-        >
-          <LockOpen className="size-3.5" aria-hidden="true" />
-          <span className="hidden sm:inline">Admin</span>
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={openAdminDialog}
-          className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink-2 hover:text-ink"
-          aria-label="Unlock admin"
-        >
-          <Lock className="size-3.5" aria-hidden="true" />
-          <span className="hidden sm:inline">Unlock</span>
-        </button>
-      )}
     </header>
   );
 }

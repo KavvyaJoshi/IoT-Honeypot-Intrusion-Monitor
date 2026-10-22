@@ -6,6 +6,7 @@ import { BarList } from '../components/charts/BarList.jsx';
 import { ChartCard, DataTable } from '../components/charts/ChartCard.jsx';
 import { TimeSeriesChart } from '../components/charts/TimeSeriesChart.jsx';
 import { categoryLabel } from '../components/ui/Badge.jsx';
+import { SketchPlanet } from '../components/doodles/Doodles.jsx';
 import { PageHeader } from '../components/ui/Card.jsx';
 import { SegmentedControl, SelectField } from '../components/ui/Controls.jsx';
 import { EmptyState } from '../components/ui/States.jsx';
@@ -73,7 +74,8 @@ export default function AnalyticsPage() {
     <>
       <PageHeader
         title="Analytics"
-        description="Aggregations computed by MongoDB over stored events. Use the table toggle on any chart to read exact values."
+        description="The long view: how much traffic, what kind of invaders, and what the rules did about them. Every chart has a table view."
+        doodle={<SketchPlanet className="w-full" />}
       />
 
       <div className="mb-5 flex flex-wrap items-end gap-3">
@@ -81,7 +83,7 @@ export default function AnalyticsPage() {
         <SelectField label="Source" hideLabel value={source} onChange={setSource} options={SOURCE_FILTER_OPTIONS} className="w-44" />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-line bg-line xl:grid-cols-2 *:rounded-none *:border-0">
         <ChartCard
           title="Request volume over time"
           icon={Activity}

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { api } from '../api/endpoints.js';
 import { SOCKET_EVENTS } from '../api/socket.js';
+import { SketchRocket } from '../components/doodles/Doodles.jsx';
 import { StatusIndicator } from '../components/ui/Badge.jsx';
 import { Card, CardBody, CardHeader, KeyValueList, PageHeader } from '../components/ui/Card.jsx';
 import { AsyncContent, EmptyState } from '../components/ui/States.jsx';
@@ -228,7 +229,8 @@ export default function DevicesPage() {
     <>
       <PageHeader
         title="Devices"
-        description="Registered ESP8266 honeypot devices. A device is Online only while its heartbeats arrive within the configured timeout."
+        description="Your ESP8266 outposts. A device counts as online only while its heartbeats keep arriving."
+        doodle={<SketchRocket className="w-full" />}
       />
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_400px]">
         <div>

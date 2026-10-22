@@ -12,9 +12,8 @@ const EventsPage = lazy(() => import('./pages/EventsPage.jsx'));
 const EventDetailPage = lazy(() => import('./pages/EventDetailPage.jsx'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage.jsx'));
 const DevicesPage = lazy(() => import('./pages/DevicesPage.jsx'));
-const RulesPage = lazy(() => import('./pages/RulesPage.jsx'));
+const AdminPage = lazy(() => import('./pages/AdminPage.jsx'));
 const SimulatorPage = lazy(() => import('./pages/SimulatorPage.jsx'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'));
 
 const page = (Component) => (
@@ -32,10 +31,11 @@ export function AppRoutes() {
         <Route path="events/:id" element={page(EventDetailPage)} />
         <Route path="analytics" element={page(AnalyticsPage)} />
         <Route path="devices" element={page(DevicesPage)} />
-        <Route path="rules" element={page(RulesPage)} />
+        <Route path="admin" element={page(AdminPage)} />
+        <Route path="rules" element={<Navigate to="/admin?tab=rules" replace />} />
         <Route path="lab" element={page(SimulatorPage)} />
         <Route path="simulator" element={<Navigate to="/lab" replace />} />
-        <Route path="settings" element={page(SettingsPage)} />
+        <Route path="settings" element={<Navigate to="/admin?tab=settings" replace />} />
         <Route path="*" element={page(NotFoundPage)} />
       </Route>
     </Routes>

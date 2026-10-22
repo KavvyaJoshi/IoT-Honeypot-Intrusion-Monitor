@@ -26,12 +26,15 @@ export function CardBody({ className = '', children }) {
   return <div className={`p-4 ${className}`}>{children}</div>;
 }
 
-export function PageHeader({ title, description, actions }) {
+export function PageHeader({ title, description, actions, doodle }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div className="min-w-0">
-        <h1 className="text-3xl font-semibold tracking-tight text-ink">{title}</h1>
-        {description && <p className="mt-2 max-w-2xl text-ink-2">{description}</p>}
+    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+      <div className="flex min-w-0 items-center gap-4">
+        {doodle && <div className="hidden w-20 shrink-0 text-ink-2 sm:block">{doodle}</div>}
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
+          {description && <p className="mt-1 max-w-2xl text-sm text-ink-2">{description}</p>}
+        </div>
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>

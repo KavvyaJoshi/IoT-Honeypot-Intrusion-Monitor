@@ -133,8 +133,8 @@ export function Toggle({ checked, onChange, label, disabled = false, srOnlyLabel
           disabled={disabled}
           onChange={(e) => onChange(e.target.checked)}
         />
-        <span className="h-5 w-9 rounded-full bg-surface-3 ring-1 ring-line-strong transition-colors peer-checked:bg-emerald-500/80 peer-focus-visible:outline-2 peer-focus-visible:outline-accent" />
-        <span className="absolute left-0.5 top-0.5 size-4 rounded-full bg-ink transition-transform peer-checked:translate-x-4" />
+        <span className="h-5 w-9 rounded-full bg-surface-3 ring-1 ring-line-strong transition-colors peer-checked:bg-ink peer-focus-visible:outline-2 peer-focus-visible:outline-accent" />
+        <span className="absolute left-0.5 top-0.5 size-4 rounded-full bg-ink transition-transform peer-checked:translate-x-4 peer-checked:bg-canvas" />
       </span>
       <span className={srOnlyLabel ? 'sr-only' : 'text-sm text-ink-2'}>{label}</span>
     </label>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-const COLORS = ['#c8f135', '#f4f1ea', '#34d399', '#60a5fa', '#e879f9', '#fbbf24'];
+const COLORS = ['#f4f1ea', '#f4f1ea', '#34d399', '#60a5fa', '#e879f9', '#fbbf24'];
 
 /** A one-shot confetti burst from the top-centre of the screen whenever `burstKey` changes. */
 export function Confetti({ burstKey, pieces = 70 }) {

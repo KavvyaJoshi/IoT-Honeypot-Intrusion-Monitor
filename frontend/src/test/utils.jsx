@@ -14,9 +14,6 @@ export const defaultSystem = {
   isAdmin: false,
   unlockAdmin: async () => {},
   lockAdmin: () => {},
-  adminDialogOpen: false,
-  openAdminDialog: () => {},
-  closeAdminDialog: () => {},
 };
 
 /** Renders UI with a router and a stubbed system context (no network, no sockets). */

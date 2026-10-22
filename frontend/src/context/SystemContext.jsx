@@ -17,7 +17,6 @@ export function SystemProvider({ children }) {
   const [database, setDatabase] = useState(null);
   const [socketState, setSocketState] = useState({ connected: false, transport: null });
   const [adminToken, setAdminTokenState] = useState(getAdminToken());
-  const [adminDialogOpen, setAdminDialogOpen] = useState(false);
 
   const refreshHealth = useCallback(async () => {
     const started = performance.now();
@@ -85,11 +84,8 @@ export function SystemProvider({ children }) {
       isAdmin: Boolean(adminToken),
       unlockAdmin,
       lockAdmin,
-      adminDialogOpen,
-      openAdminDialog: () => setAdminDialogOpen(true),
-      closeAdminDialog: () => setAdminDialogOpen(false),
     }),
-    [health, apiReachable, apiLatencyMs, database, socketState, adminToken, unlockAdmin, lockAdmin, adminDialogOpen, refreshHealth],
+    [health, apiReachable, apiLatencyMs, database, socketState, adminToken, unlockAdmin, lockAdmin, refreshHealth],
   );
 
   return <SystemContext.Provider value={value}>{children}</SystemContext.Provider>;

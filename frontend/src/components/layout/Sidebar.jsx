@@ -1,6 +1,6 @@
-import { ChartColumn, Cpu, FlaskConical, House, ListFilter, Settings, SlidersHorizontal, X } from 'lucide-react';
+import { ChartColumn, Cpu, FlaskConical, House, ListFilter, Lock, LockOpen, SatelliteDish, ShieldCheck, X } from 'lucide-react';
 import { NavLink } from 'react-router';
-import { Pip } from '../mascot/Pip.jsx';
+import { useSystem } from '../../context/SystemContext.jsx';
 
 export const NAV_GROUPS = [
   {
@@ -13,23 +13,18 @@ export const NAV_GROUPS = [
     ],
   },
   { label: 'Learn', items: [{ to: '/lab', label: 'Practice lab', icon: FlaskConical }] },
-  {
-    label: 'Configure',
-    items: [
-      { to: '/rules', label: 'Rules', icon: SlidersHorizontal },
-      { to: '/settings', label: 'Settings', icon: Settings },
-    ],
-  },
+  { label: 'Manage', items: [{ to: '/admin', label: 'Admin panel', icon: ShieldCheck, lockState: true }] },
 ];
 
 function NavItems({ onNavigate }) {
+  const { isAdmin } = useSystem();
   return (
     <div className="space-y-5">
       {NAV_GROUPS.map((group) => (
         <div key={group.label ?? 'main'}>
           {group.label && <p className="label mb-1.5 px-3">{group.label}</p>}
           <ul className="space-y-0.5">
-            {group.items.map(({ to, label, icon: Icon, end }) => (
+            {group.items.map(({ to, label, icon: Icon, end, lockState }) => (
               <li key={to}>
                 <NavLink
                   to={to}
@@ -44,7 +39,13 @@ function NavItems({ onNavigate }) {
                   {({ isActive }) => (
                     <>
                       <Icon className={`size-4.5 shrink-0 ${isActive ? 'text-accent' : ''}`} aria-hidden="true" />
-                      {label}
+                      <span className="flex-1">{label}</span>
+                      {lockState &&
+                        (isAdmin ? (
+                          <LockOpen className="size-3.5 text-emerald-300" aria-label="unlocked" />
+                        ) : (
+                          <Lock className="size-3.5 text-ink-3" aria-label="locked" />
+                        ))}
                     </>
                   )}
                 </NavLink>
@@ -60,12 +61,12 @@ function NavItems({ onNavigate }) {
 function Brand() {
   return (
     <div className="flex items-center gap-3 px-3">
-      <div className="grid size-10 place-items-center overflow-hidden rounded-xl border border-line bg-surface-2">
-        <Pip size={30} trackPointer={false} />
+      <div className="grid size-9 place-items-center rounded-lg bg-ink text-canvas">
+        <SatelliteDish className="size-5" strokeWidth={2.25} aria-hidden="true" />
       </div>
       <div className="leading-tight">
-        <p className="text-sm font-semibold tracking-tight text-ink">Honeypot Monitor</p>
-        <p className="label mt-0.5">IoT security lab</p>
+        <p className="text-base font-semibold tracking-tight text-ink">Outpost</p>
+        <p className="text-xs text-ink-3">IoT honeypot monitor</p>
       </div>
     </div>
   );

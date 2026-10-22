@@ -46,7 +46,7 @@ Terminal 2:
 cd frontend
 npm run dev
 ```
-Open http://localhost:5173. Click **Unlock admin** (top right) and paste `ADMIN_TOKEN` to enable the simulator and editing.
+Open http://localhost:5173. Go to **Admin panel → Access** and paste `ADMIN_TOKEN` to enable the simulator and editing.
 
 To open the dashboard from another device on the LAN, run `npm run dev -- --host` and add that origin (e.g. `http://192.168.1.20:5173`) to `CORS_ORIGINS`.
 
@@ -83,7 +83,7 @@ If you serve `dist` from another server, set `VITE_API_BASE_URL` before building
 
 ## Resetting data
 
-- Simulated data only: **Practice lab → Lab tools → Delete simulated events** (or `POST /api/simulator/reset`).
+- Simulated data only: **Admin panel → Lab tools → Delete simulated events** (or `POST /api/simulator/reset`).
 - Everything (development only): `mongosh iot_honeypot --eval "db.dropDatabase()"`, or delete the `iot_honeypot` database in MongoDB Compass. Defaults are re-seeded on the next backend start.
 
 `mongosh` is a separate download since MongoDB 6 (https://www.mongodb.com/try/download/shell). MongoDB Compass works just as well for inspecting the `events`, `devices`, `rules` and `settings` collections.

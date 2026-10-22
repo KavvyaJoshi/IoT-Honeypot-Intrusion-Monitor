@@ -1,11 +1,12 @@
 @import 'tailwindcss';
 
-/* "Black & signal": true-black base, warm white text, one electric-lime accent used sparingly
-   (primary actions, active nav, XP, the mascot). Status colours (green/amber/red) are reserved
-   for meaning. Chart series colours live in src/lib/constants.js, validated on --color-surface. */
+/* Black and warm white. The accent is a neutral off-white (primary buttons, active nav, XP);
+   colour is reserved for meaning: green = ok/allowed, amber = warning, red = danger.
+   Fonts are Google Fonts bundled via @fontsource (see main.jsx). Chart series colours live in
+   src/lib/constants.js and were validated on --color-surface. */
 @theme {
-  --font-sans: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'Cascadia Mono', ui-monospace, 'JetBrains Mono', Consolas, 'Liberation Mono', monospace;
+  --font-sans: 'Space Grotesk Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
 
   --color-canvas: #000000;
   --color-surface: #0f0f0f;
@@ -17,10 +18,10 @@
   --color-ink-2: #b9b4aa;
   --color-ink-3: #85807a;
 
-  --color-accent: #c8f135;
-  --color-accent-strong: #b3dc1f;
-  --color-accent-ink: #dcf78a;
-  --color-on-accent: #0b0f00;
+  --color-accent: #ece9e2;
+  --color-accent-strong: #ffffff;
+  --color-accent-ink: #ffffff;
+  --color-on-accent: #0b0b0b;
 }
 
 :root {
@@ -40,7 +41,7 @@ body {
 }
 
 ::selection {
-  background: rgb(200 241 53 / 0.3);
+  background: rgb(236 233 226 / 0.25);
 }
 
 :focus-visible {
@@ -93,7 +94,7 @@ body {
 .lift:hover { transform: translateY(-3px); }
 
 @keyframes row-arrive {
-  from { background-color: rgb(200 241 53 / 0.12); }
+  from { background-color: rgb(236 233 226 / 0.1); }
   to { background-color: transparent; }
 }
 .row-arrive { animation: row-arrive 2.4s ease-out; }
@@ -149,6 +150,80 @@ body {
   100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); }
 }
 .confetti-piece { animation: confetti var(--dur, 1.4s) cubic-bezier(0.15, 0.6, 0.35, 1) forwards; }
+
+/* ---------- Doodles: hand-written notes and sketches that draw themselves ---------- */
+.font-doodle {
+  font-family: 'Caveat', 'Segoe Print', cursive;
+  font-weight: 600;
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.4s ease-out forwards; }
+/* Sketches rise in once when the page opens. */
+.doodle-in { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+.twinkle { animation: twinkle var(--tw, 3s) ease-in-out infinite; animation-delay: var(--td, 0s); }
+@keyframes wiggle { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+.wiggle { transform-box: fill-box; transform-origin: center; animation: wiggle 3s ease-in-out infinite; }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(var(--drift, 40px)); } }
+.drift { animation: drift 14s ease-in-out infinite alternate; }
+
+/* Rank progress: the rocket bobs on its way to the flag. */
+@keyframes rocket-bob { 50% { transform: translate(-50%, -3px) rotate(45deg); } }
+.rocket-bob { transform: translate(-50%, 0) rotate(45deg); animation: rocket-bob 1.6s ease-in-out infinite; }
+
+/* ---------- Space scene: each flagged request is an alien ship ---------- */
+/* Positions come from unitless CSS variables (--sx start x, --hx/--hy hover point, --ex exit x). */
+@keyframes ship-destroyed {
+  0% { transform: translate(calc(var(--sx) * 1px), -90px); opacity: 0; }
+  8% { opacity: 1; }
+  38% { transform: translate(calc(var(--hx) * 1px), calc(var(--hy) * 1px)); }
+  50% { transform: translate(calc(var(--hx) * 1px - 6px), calc(var(--hy) * 1px + 3px)); }
+  62% { transform: translate(calc(var(--hx) * 1px + 6px), calc(var(--hy) * 1px)); opacity: 1; }
+  66%, 100% { transform: translate(calc(var(--hx) * 1px), calc(var(--hy) * 1px)) scale(0.2); opacity: 0; }
+}
+@keyframes ship-frozen {
+  0% { transform: translate(calc(var(--sx) * 1px), -90px); opacity: 0; }
+  8% { opacity: 1; }
+  38% { transform: translate(calc(var(--hx) * 1px), calc(var(--hy) * 1px)); }
+  80% { transform: translate(calc(var(--hx) * 1px + 8px), calc(var(--hy) * 1px - 4px)); opacity: 1; }
+  100% { transform: translate(calc(var(--hx) * 1px + 20px), -90px); opacity: 0; }
+}
+@keyframes ship-spotted {
+  0% { transform: translate(calc(var(--sx) * 1px), -90px); opacity: 0; }
+  8% { opacity: 1; }
+  38%, 70% { transform: translate(calc(var(--hx) * 1px), calc(var(--hy) * 1px)); opacity: 1; }
+  100% { transform: translate(calc(var(--ex) * 1px), calc(var(--hy) * 1px - 50px)); opacity: 0.4; }
+}
+@keyframes shuttle-land {
+  0% { transform: translate(calc(var(--sx) * 1px), -40px) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translate(500px, 352px) scale(0.3); opacity: 0; }
+}
+.ship-destroyed { animation: ship-destroyed var(--life, 4.4s) cubic-bezier(0.3, 0.6, 0.3, 1) forwards; }
+.ship-frozen { animation: ship-frozen var(--life, 4.4s) cubic-bezier(0.3, 0.6, 0.3, 1) forwards; }
+.ship-spotted { animation: ship-spotted var(--life, 4.4s) cubic-bezier(0.3, 0.6, 0.3, 1) forwards; }
+.shuttle-land { animation: shuttle-land var(--life, 3s) ease-in forwards; }
+
+/* Laser fires at ~63% of the ship's life; the explosion follows. */
+@keyframes laser { 0%, 60% { opacity: 0; stroke-width: 0; } 62% { opacity: 1; stroke-width: 5; } 67% { opacity: 1; stroke-width: 2; } 72%, 100% { opacity: 0; } }
+.laser { animation: laser var(--life, 4.4s) linear forwards; }
+@keyframes boom { 0%, 63% { transform: scale(0); opacity: 0; } 66% { transform: scale(0.6); opacity: 1; } 82% { transform: scale(1.4); opacity: 0.9; } 100% { transform: scale(1.8); opacity: 0; } }
+.boom { transform-box: fill-box; transform-origin: center; animation: boom var(--life, 4.4s) ease-out forwards; }
+@keyframes debris { 0%, 64% { transform: translate(0, 0); opacity: 0; } 66% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) rotate(220deg); opacity: 0; } }
+.debris { transform-box: fill-box; transform-origin: center; animation: debris var(--life, 4.4s) ease-out forwards; }
+@keyframes pop-tag { 0%, 64% { opacity: 0; transform: translateY(6px) scale(0.6); } 70%, 92% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+.pop-tag { transform-box: fill-box; transform-origin: center; animation: pop-tag var(--life, 4.4s) ease-out forwards; }
+
+/* Stasis bubble (rate-limited) and radar lock (logged) appear once the ship arrives. */
+@keyframes appear-late { 0%, 36% { opacity: 0; transform: scale(0.4); } 44%, 100% { opacity: 1; transform: none; } }
+.appear-late { transform-box: fill-box; transform-origin: center; animation: appear-late var(--life, 4.4s) ease-out forwards; }
+@keyframes ping { 0%, 38% { transform: scale(0.3); opacity: 0; } 42% { opacity: 0.9; } 70% { transform: scale(2.4); opacity: 0; } 100% { opacity: 0; } }
+.ping { transform-box: fill-box; transform-origin: center; animation: ping var(--life, 4.4s) ease-out forwards; }
+@keyframes blink-lights { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+.ship-lights { animation: blink-lights 0.6s steps(2) infinite; }
+@keyframes recoil { 0%, 61% { transform: translateY(0); } 63% { transform: translateY(5px); } 70%, 100% { transform: translateY(0); } }
+.recoil { animation: recoil var(--life, 4.4s) ease-out forwards; }
 
 @media (prefers-reduced-motion: reduce) {
   *,

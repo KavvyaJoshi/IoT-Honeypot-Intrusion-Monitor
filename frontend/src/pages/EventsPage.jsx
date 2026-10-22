@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { api } from '../api/endpoints.js';
 import { SOCKET_EVENTS } from '../api/socket.js';
+import { SketchUfo } from '../components/doodles/Doodles.jsx';
 import { EventTable } from '../components/events/EventTable.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Card, PageHeader } from '../components/ui/Card.jsx';
@@ -138,7 +139,8 @@ export default function EventsPage() {
     <>
       <PageHeader
         title="Events"
-        description="Everything the honeypot saw, newest first. Click a row to see why it was flagged."
+        description="The radar log: every visitor and invader the honeypot saw, newest first. Click a row to see why it was flagged."
+        doodle={<SketchUfo className="w-full" />}
         actions={
           <Button size="sm" variant="ghost" icon={live ? Pause : Play} onClick={() => setLive((v) => !v)}>
             {live ? 'Pause live' : 'Resume live'}

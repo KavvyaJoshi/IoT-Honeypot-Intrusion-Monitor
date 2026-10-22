@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import { useMissions } from '../../game/MissionsContext.jsx';
-import { AdminDialog } from '../AdminDialog.jsx';
 import { Confetti } from '../fx/Confetti.jsx';
 import { PipBuddy } from '../mascot/PipBuddy.jsx';
 import { Sidebar } from './Sidebar.jsx';
@@ -28,7 +27,6 @@ export function AppShell() {
       </div>
       <PipBuddy />
       <Confetti burstKey={celebration?.at} />
-      <AdminDialog />
     </div>
   );
 }

@@ -1,20 +1,20 @@
 import { ChevronDown, ChevronUp, Gauge, Layers, RotateCcw, Save, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { describeError } from '../api/client.js';
-import { api } from '../api/endpoints.js';
-import { SOCKET_EVENTS } from '../api/socket.js';
-import { AdminRequiredNotice } from '../components/AdminDialog.jsx';
-import { DataTable } from '../components/charts/ChartCard.jsx';
-import { Badge, categoryLabel, SeverityBadge, SourceBadge } from '../components/ui/Badge.jsx';
-import { Button } from '../components/ui/Button.jsx';
-import { Card, CardHeader, PageHeader } from '../components/ui/Card.jsx';
-import { SelectField, TextArea, TextField, Toggle } from '../components/ui/Controls.jsx';
-import { AsyncContent, EmptyState } from '../components/ui/States.jsx';
-import { useSystem } from '../context/SystemContext.jsx';
-import { useApi } from '../hooks/useApi.js';
-import { useNow, useThrottledSocketRefresh } from '../hooks/useSocket.js';
-import { SEVERITIES, SEVERITY_META } from '../lib/constants.js';
-import { formatNumber, formatRelative, formatTime } from '../lib/format.js';
+import { describeError } from '../../api/client.js';
+import { api } from '../../api/endpoints.js';
+import { SOCKET_EVENTS } from '../../api/socket.js';
+import { AdminRequiredNotice } from './AdminAccess.jsx';
+import { DataTable } from '../charts/ChartCard.jsx';
+import { Badge, categoryLabel, SeverityBadge, SourceBadge } from '../ui/Badge.jsx';
+import { Button } from '../ui/Button.jsx';
+import { Card, CardHeader } from '../ui/Card.jsx';
+import { SelectField, TextArea, TextField, Toggle } from '../ui/Controls.jsx';
+import { AsyncContent, EmptyState } from '../ui/States.jsx';
+import { useSystem } from '../../context/SystemContext.jsx';
+import { useApi } from '../../hooks/useApi.js';
+import { useNow, useThrottledSocketRefresh } from '../../hooks/useSocket.js';
+import { SEVERITIES, SEVERITY_META } from '../../lib/constants.js';
+import { formatNumber, formatRelative, formatTime } from '../../lib/format.js';
 
 const ACTION_OPTIONS = [
   { value: 'log', label: 'Log only' },
@@ -233,7 +233,8 @@ function EnforcementTable({ state }) {
   );
 }
 
-export default function RulesPage() {
+/** Rule list with on/off and tuning, plus active decisions (Admin panel section). */
+export function RulesSection() {
   const { isAdmin } = useSystem();
   const rules = useApi(() => api.rules(), []);
   const stats = useApi(() => api.detectionStats({ range: '24h' }), [], { refreshInterval: 15000 });
@@ -245,11 +246,6 @@ export default function RulesPage() {
 
   return (
     <>
-      <PageHeader
-        title="Rules"
-        description="Each rule watches for one kind of suspicious behaviour. Switch rules on or off, or tune how sensitive they are."
-      />
-
       <div className="mb-4 space-y-3">
         <AdminRequiredNotice action="change rules" />
       </div>

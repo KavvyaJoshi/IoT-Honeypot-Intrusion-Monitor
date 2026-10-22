@@ -1,4 +1,4 @@
-import { CircleCheck, Lock, Trophy } from 'lucide-react';
+import { CircleCheck, Flag, Lock, Rocket, Trophy } from 'lucide-react';
 import { Link } from 'react-router';
 import { useMissions } from './MissionsContext.jsx';
 
@@ -57,8 +57,13 @@ export function RankCard({ compact = false }) {
         <p className={`${compact ? 'text-base' : 'text-xl'} font-semibold text-ink`}>
           {rank.name} <span className="text-sm font-normal text-ink-3">· level {rank.level}</span>
         </p>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(rank.progress * 100)} aria-label="Progress to next rank">
+        {/* A rocket flying toward the next rank's flag. */}
+        <div className="relative mt-3 h-1.5 rounded-full bg-surface-3" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(rank.progress * 100)} aria-label="Progress to next rank">
           <div className="h-full rounded-full bg-accent" style={{ width: `${rank.progress * 100}%`, transition: 'width 0.6s ease' }} />
+          <span className="rocket-bob absolute -top-2.5" style={{ left: `${Math.max(3, Math.min(97, rank.progress * 100))}%` }}>
+            <Rocket className="size-4 fill-canvas text-accent" aria-hidden="true" />
+          </span>
+          <Flag className="absolute -top-3 -right-1 size-3.5 text-ink-3" aria-hidden="true" />
         </div>
         <p className="mt-1.5 text-xs text-ink-3">
           {xp} XP · {completed}/{missions.length} missions
@@ -74,35 +79,33 @@ export function MissionList({ limit }) {
   const { missions } = useMissions();
   const ordered = [...missions].sort((a, b) => Number(a.done) - Number(b.done));
   const shown = limit ? ordered.slice(0, limit) : ordered;
+  // One compact list: open missions show how to finish them, completed ones collapse to a line.
   return (
-    <ul className="stagger grid grid-cols-1 gap-2.5 md:grid-cols-2">
+    <ul className="stagger divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
       {shown.map((mission) => {
         const Icon = mission.icon;
         return (
-          <li
-            key={mission.id}
-            className={`lift flex items-start gap-3 rounded-xl border p-3.5 ${
-              mission.done ? 'border-emerald-500/30 bg-emerald-500/[0.06]' : 'border-line bg-surface-2/60'
-            }`}
-          >
-            <div className={`grid size-9 shrink-0 place-items-center rounded-lg ${mission.done ? 'bg-emerald-500/15 text-emerald-300' : 'bg-surface-3 text-ink-3'}`}>
-              {mission.done ? <CircleCheck className="size-5" aria-hidden="true" /> : <Icon className="size-5" aria-hidden="true" />}
-            </div>
+          <li key={mission.id} className="flex items-start gap-3 px-4 py-3">
+            {mission.done ? (
+              <CircleCheck className="mt-0.5 size-4 shrink-0 text-emerald-300" aria-hidden="true" />
+            ) : (
+              <Icon className="mt-0.5 size-4 shrink-0 text-ink-3" aria-hidden="true" />
+            )}
             <div className="min-w-0 flex-1">
-              <div className="flex items-baseline justify-between gap-2">
-                <p className="text-sm font-semibold text-ink">{mission.title}</p>
-                <span className={`shrink-0 text-xs font-semibold ${mission.done ? 'text-emerald-300' : 'text-accent'}`}>
-                  {mission.done ? 'Done' : `+${mission.xp} XP`}
-                </span>
-              </div>
-              <p className="mt-0.5 text-sm text-ink-2">{mission.goal}</p>
+              <p className={`text-sm ${mission.done ? 'text-ink-3' : 'font-medium text-ink'}`}>
+                {mission.title}
+                {!mission.done && <span className="font-normal text-ink-2"> · {mission.goal}</span>}
+              </p>
               {!mission.done && (
-                <p className="mt-1 flex items-start gap-1.5 text-xs text-ink-3">
+                <p className="mt-0.5 flex items-start gap-1.5 text-xs text-ink-3">
                   <Lock className="mt-0.5 size-3 shrink-0" aria-hidden="true" />
                   {mission.how}
                 </p>
               )}
             </div>
+            <span className={`shrink-0 font-mono text-xs ${mission.done ? 'text-emerald-300' : 'text-accent'}`}>
+              {mission.done ? 'done' : `+${mission.xp} XP`}
+            </span>
           </li>
         );
       })}

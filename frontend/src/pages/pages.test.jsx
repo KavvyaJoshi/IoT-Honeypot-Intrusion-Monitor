@@ -36,20 +36,32 @@ describe('DashboardPage', () => {
     api.events.mockResolvedValue({ data: [makeEvent()], pagination: { page: 1, limit: 8, total: 1, totalPages: 1 } });
     api.devices.mockResolvedValue({ data: [{ deviceId: 'esp-lab-01', status: 'online', lastHeartbeatAt: new Date().toISOString() }] });
 
+    api.eventStats.mockResolvedValue({
+      ...emptyStats(),
+      totals: { ...emptyStats().totals, total: 42, suspicious: 7, highSeverity: 3, critical: 1, activeEnforcements: 2 },
+      byAction: [
+        { action: 'blocked', count: 5 },
+        { action: 'logged', count: 2 },
+        { action: 'allowed', count: 35 },
+      ],
+    });
+
     renderWithProviders(<DashboardPage />);
-    expect(await screen.findByText('3 high-risk alerts need a look.')).toBeInTheDocument();
-    expect(screen.getAllByText('42').length).toBeGreaterThan(0);
-    expect(screen.getByText('7')).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: /Pip the sentry bot, on alert/ })).toBeInTheDocument();
-    expect(api.eventStats).toHaveBeenCalledWith({ range: '1h' });
+    expect(await screen.findByText('3 high-risk invaders need a look.')).toBeInTheDocument();
+    expect(screen.getByText(/42 requests/)).toBeInTheDocument();
+    // outcome counts double as the scene legend
+    expect(screen.getByText('Shot down').closest('div')).toHaveTextContent('5');
+    expect(screen.getByText('Landed safely').closest('div')).toHaveTextContent('35');
+    expect(screen.getByRole('img', { name: /Defense scene/ })).toBeInTheDocument();
+    expect(api.eventStats).toHaveBeenCalledWith({ range: '24h' });
   });
 
   it('says "All quiet" when nothing was flagged', async () => {
     api.eventStats.mockResolvedValue({ ...emptyStats(), totals: { ...emptyStats().totals, total: 12 } });
     api.events.mockResolvedValue({ data: [makeEvent()], pagination: { page: 1, limit: 6, total: 1, totalPages: 1 } });
     renderWithProviders(<DashboardPage />);
-    expect(await screen.findByText('All quiet.')).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: /calm/ })).toBeInTheDocument();
+    expect(await screen.findByText('All quiet in your sector.')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Pip the sentry bot, calm/ })).toBeInTheDocument();
   });
 
   it('shows a getting-started guide before the first event', async () => {
@@ -57,8 +69,9 @@ describe('DashboardPage', () => {
     api.events.mockResolvedValue({ data: [], pagination: { page: 1, limit: 6, total: 0, totalPages: 1 } });
 
     renderWithProviders(<DashboardPage />);
-    expect(await screen.findByText("Welcome! Let's catch your first signal.")).toBeInTheDocument();
-    expect(screen.getByText('No alerts yet')).toBeInTheDocument();
+    expect(await screen.findByText('Launch a practice wave')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Unlock admin/ })).toHaveAttribute('href', '/admin');
+    expect(screen.getByText('No invaders yet. The sky is clear!')).toBeInTheDocument();
   });
 
   it('shows an actionable error when the API is down', async () => {
@@ -206,8 +219,9 @@ describe('SimulatorPage', () => {
     api.scenarios.mockResolvedValue([{ id: 'normal', label: 'Normal request', description: 'One request', relatedRules: [] }]);
     renderWithProviders(<SimulatorPage />);
     expect(await screen.findByText('Normal request')).toBeInTheDocument();
-    expect(screen.getByText(/Admin token required to run practice scenarios/)).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByRole('button', { name: /^run$/i })).toBeDisabled());
+    expect(screen.getByRole('link', { name: 'Admin panel' })).toHaveAttribute('href', '/admin');
+    await waitFor(() => expect(screen.getByRole('button', { name: /launch/i })).toBeDisabled());
+    expect(screen.getByText('simulation')).toBeInTheDocument();
   });
 
   it('shows a disabled state when the server disables the simulator', () => {
